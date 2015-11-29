@@ -1,0 +1,25 @@
+apply plugin: 'release-plugin'
+apply plugin: 'commercial-plugin'
+
+docgen.product = 'XL Deploy'
+docgen.chefPluginManual = [
+        title: 'Chef Plugin Manual',
+        appendCiReference: true,
+        appendStepReference: true,
+        prefixes: 'chef'
+]
+
+thirdPartyLicense {
+    reportHeader = """This notice contains information about the OSS software used in the chef plugin. The plugin contains the following OSS components
+grouped by license:\n"""
+}
+
+dependencies {
+    compile overthere
+    compile xl_deploy_generic_plugin
+
+    testCompile junit
+    testCompile xl_deploy_test_engine
+    testCompile overcast
+    testCompile "org.xmlmatchers:xml-matchers:0.10"
+}

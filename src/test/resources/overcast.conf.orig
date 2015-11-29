@@ -1,0 +1,74 @@
+# In jenkins jobs the shared vagrant scripts are checked out in the ITEST_VAGRANT_REPO/vagrant.
+# Developers can set ITEST_VAGRANT_REPO or provide definitions in their global overcast properties
+# the default value here is to prevent freemarker exceptions, which leads to ClassNotFound
+# exceptions (!) in the gradle build. The default value is a bit more in your face.
+
+//chef-101-unix {
+//  vagrantDir=${ITEST_VAGRANT_REPO}"/itest/xldchef"
+//	vagrantVm="chef101"
+//	vagrantIp="10.10.30.9"
+//	vagrantSnapshotExpirationCmd="git rev-parse HEAD"
+//}
+
+
+// expected settings:
+// - itest.libvirtHost
+// - itest.libvirtUrl
+// - itest.vagrantDir
+// - itest.catalogDir
+// - itest.bootDelay (optional)
+// - itest.provisionedBootDelay (optional) (after provisioning booting may take longer)
+// - itest.dhcpHostUrl
+// - itest.dhcpLeasesLocation
+// - itest.expirationUrl (optional)
+// - itest.dhcpTimeout (optional)
+// - itest.chef.debugFlags (optional)
+
+
+# Common setup
+
+itest.unixVmPortTimeout = 600
+chefItest {
+    basebox="base-itest"
+    provisionUrl="ssh://vagrant@{0}?os=UNIX&connectionType=SUDO&sudoUsername=root&allocatePty=xterm:80:24:0:0&privateKeyFile="${user.home}"/.ssh/base-itest.pem"
+    expirationUrl="ssh://"${itest.libvirtHost}"?os=UNIX&connectionType=SCP&privateKeyFile="${user.home}"/.ssh/id_rsa"
+    expirationUrl=${?itest.expirationUrl}
+    vagrantDir=${itest.vagrantDir}"/itest/xldchef"
+    expirationCmd="""f=`find """${chefItest.vagrantDir}""" -type f` && cat $f | sha256sum"""
+}
+
+
+chef-template-unix {
+    libvirtURL=${itest.libvirtUrl}
+    baseDomain=${chefItest.basebox}
+    network="br0"
+    bootDelay=5
+    bootDelay=${?itest.bootDelay}
+
+    fsMapping {
+        9p-vagrant { hostPath = ${chefItest.vagrantDir}, readOnly = true }
+        9p-catalog { hostPath = ${itest.catalogDir}, readOnly = true }
+    }
+
+    ipLookupStrategy="SSH"
+    SSH {
+        url=${itest.dhcpHostUrl}
+        command="""grep {0} """${itest.dhcpLeasesLocation}""" | cut -d " " -f 3"""
+        timeout=30
+        timeout=${?itest.dhcpTimeout}
+    }
+
+    provision {
+        bootDelay=10
+        bootDelay=${?itest.provisionedBootDelay}
+
+        url=${chefItest.provisionUrl}
+        expirationTag {
+            url=${chefItest.expirationUrl}
+            cmd=${chefItest.expirationCmd}
+        }
+    }
+}
+
+chef-101-unix = ${chef-template-unix}
+chef-101-unix.provision.cmd="""bash /vagrant/scripts/chef-install.sh"""
