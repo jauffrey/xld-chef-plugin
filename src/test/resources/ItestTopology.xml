@@ -1,0 +1,24 @@
+<itest>
+    <toplogy id="chef-101-unix" enableByDefault="false">
+        <placeholders>
+            <host>chef-101-unix</host>
+        </placeholders>
+        <targets>
+            <target id="Infrastructure/chef-101-unix/chef">
+            </target>
+        </targets>
+        <configurationItems>
+            <overthere.SshHost id="Infrastructure/chef-101-unix">
+                <os>UNIX</os>
+                <connectionType>SUDO</connectionType>
+                <address>${chef-101-unix}</address>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <sudoUsername>root</sudoUsername>
+            </overthere.SshHost>
+            <chef.Solo id="Infrastructure/chef-101-unix/chef">
+                <chefPath>/usr/local/bin</chefPath>
+            </chef.Solo>
+        </configurationItems>
+    </toplogy>
+</itest>

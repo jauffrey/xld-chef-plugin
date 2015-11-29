@@ -1,0 +1,61 @@
+// expected settings:
+// - itest.libvirtHost
+// - itest.libvirtUrl
+// - itest.vagrantDir
+// - itest.catalogDir
+// - itest.bootDelay (optional)
+// - itest.provisionedBootDelay (optional) (after provisioning booting may take longer)
+// - itest.dhcpHostUrl
+// - itest.dhcpLeasesLocation
+// - itest.expirationUrl (optional)
+// - itest.dhcpTimeout (optional)
+// - itest.chef.debugFlags (optional)
+
+
+# Common setup
+
+itest.unixVmPortTimeout = 600
+chefItest {
+    basebox="base-itest"
+    provisionUrl="ssh://vagrant@{0}?os=UNIX&connectionType=SUDO&sudoUsername=root&allocatePty=xterm:80:24:0:0&privateKeyFile="${user.home}"/.ssh/base-itest.pem"
+    expirationUrl="ssh://"${itest.libvirtHost}"?os=UNIX&connectionType=SCP&privateKeyFile="${user.home}"/.ssh/id_rsa"
+    expirationUrl=${?itest.expirationUrl}
+    vagrantDir=${itest.vagrantDir}"/itest/xldchef"
+    expirationCmd="""f=`find """${chefItest.vagrantDir}""" -type f` && cat $f | sha256sum"""
+}
+
+
+chef-template-unix {
+    libvirtURL=${itest.libvirtUrl}
+    baseDomain=${chefItest.basebox}
+    network="br0"
+    bootDelay=5
+    bootDelay=${?itest.bootDelay}
+
+    fsMapping {
+        9p-vagrant { hostPath = ${chefItest.vagrantDir}, readOnly = true }
+        9p-catalog { hostPath = ${itest.catalogDir}, readOnly = true }
+    }
+
+    ipLookupStrategy="SSH"
+    SSH {
+        url=${itest.dhcpHostUrl}
+        command="""grep {0} """${itest.dhcpLeasesLocation}""" | cut -d " " -f 3"""
+        timeout=30
+        timeout=${?itest.dhcpTimeout}
+    }
+
+    provision {
+        bootDelay=10
+        bootDelay=${?itest.provisionedBootDelay}
+
+        url=${chefItest.provisionUrl}
+        expirationTag {
+            url=${chefItest.expirationUrl}
+            cmd=${chefItest.expirationCmd}
+        }
+    }
+}
+
+chef-101-unix = ${chef-template-unix}
+chef-101-unix.provision.cmd="""bash /vagrant/scripts/chef-install.sh"""

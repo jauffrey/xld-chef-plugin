@@ -1,0 +1,6 @@
+//chef-101-unix {
+//  vagrantDir=${ITEST_VAGRANT_REPO}"/itest/xldchef"
+//	vagrantVm="chef101"
+//	vagrantIp="10.10.30.9"
+//	vagrantSnapshotExpirationCmd="git rev-parse HEAD"
+//}

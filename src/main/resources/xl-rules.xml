@@ -1,0 +1,17 @@
+<rules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.xebialabs.com/xl-deploy/xl-rules" >
+
+    <rule name="chef.Cookbook.CREATE_MODIFY" scope="deployed">
+        <conditions>
+            <type>chef.Cookbook</type>
+            <operation>CREATE</operation>
+            <operation>MODIFY</operation>
+        </conditions>
+        <steps>
+           <os-script>
+             <script>chef/chef-solo-cookbook</script>
+             <order>71</order>
+           </os-script>
+        </steps>
+    </rule>
+</rules>
