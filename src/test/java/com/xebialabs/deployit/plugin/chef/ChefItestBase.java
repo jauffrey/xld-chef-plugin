@@ -1,19 +1,16 @@
 package com.xebialabs.deployit.plugin.chef;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.xebialabs.deployit.booter.local.LocalBooter;
-import com.xebialabs.deployit.itest.ItestWizard;
-import com.xebialabs.deployit.itest.cloudhost.ItestHostLauncher;
-import com.xebialabs.deployit.plugin.api.reflect.Type;
-import com.xebialabs.deployit.plugin.api.udm.Container;
-import com.xebialabs.deployit.plugin.api.udm.Deployed;
-import com.xebialabs.deployit.plugin.api.udm.DeployedApplication;
-import com.xebialabs.deployit.plugin.overthere.Host;
-import com.xebialabs.deployit.test.deployment.DeployitTester;
-import com.xebialabs.deployit.test.support.ItestTopology;
-import com.xebialabs.overcast.host.CloudHost;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.deployit.test.deployment.DeltaSpecifications.createDeployedApplication;
+import static com.xebialabs.platform.test.TestUtils.createDeploymentPackage;
+import static com.xebialabs.platform.test.TestUtils.createEnvironment;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -22,12 +19,27 @@ import org.junit.runners.Parameterized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.xebialabs.deployit.booter.local.LocalBooter;
+import com.xebialabs.deployit.deployment.planner.DeltaSpecificationBuilder;
+import com.xebialabs.deployit.itest.ItestWizard;
+import com.xebialabs.deployit.itest.cloudhost.ItestHostLauncher;
+import com.xebialabs.deployit.plugin.api.reflect.Type;
+import com.xebialabs.deployit.plugin.api.udm.Container;
+import com.xebialabs.deployit.plugin.api.udm.Deployable;
+import com.xebialabs.deployit.plugin.api.udm.Deployed;
+import com.xebialabs.deployit.plugin.api.udm.DeployedApplication;
+import com.xebialabs.deployit.plugin.api.udm.DeploymentPackage;
+import com.xebialabs.deployit.plugin.api.udm.Environment;
+import com.xebialabs.deployit.plugin.overthere.Host;
+import com.xebialabs.deployit.test.deployment.DeployitTester;
+import com.xebialabs.deployit.test.support.ItestTopology;
+import com.xebialabs.overcast.host.CloudHost;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereFile;
 
 @RunWith(Parameterized.class)
 public class ChefItestBase {
@@ -74,7 +86,6 @@ public class ChefItestBase {
         return constructorArgsList;
     }
 
-
     @Before
     public void takeCareOfVagrantImages() {
         ItestHostLauncher launcher = ItestHostLauncher.getInstance();
@@ -115,4 +126,26 @@ public class ChefItestBase {
     public Host getHost() {
         return (Host)topology.findFirstMatchingCi(Type.valueOf("overthere.SshHost"));
     }
+
+    protected DeltaSpecificationBuilder createDeltaSpecBuilder(Deployed<?, ?>... deployeds) {
+        Iterable<Deployable> deployables = transform(deployeds);
+        DeploymentPackage deploymentPackage = createDeploymentPackage(Iterables
+                .toArray(deployables, Deployable.class));
+        Environment environment = createEnvironment(container);
+        DeltaSpecificationBuilder specificationBuilder = new DeltaSpecificationBuilder();
+        specificationBuilder.initial(createDeployedApplication(
+                deploymentPackage, environment));
+        return specificationBuilder;
+    }
+
+    protected Iterable<Deployable> transform(Deployed<?, ?>... deployeds) {
+        return Lists.transform(newArrayList(deployeds),
+                new Function<Deployed<?, ?>, Deployable>() {
+                    @Override
+                    public Deployable apply(Deployed<?, ?> input) {
+                        return input.getDeployable();
+                    }
+                });
+    }
+
 }

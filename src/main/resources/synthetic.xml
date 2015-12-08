@@ -1,12 +1,16 @@
 <synthetic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="http://www.xebialabs.com/deployit/synthetic" xsi:schemaLocation="http://www.xebialabs.com/deployit/synthetic synthetic.xsd">
 
-    <type type="chef.Cookbook" deployable-type="chef.CookbookSpec" container-type="chef.Solo" extends="udm.BaseDeployedArtifact" description="Chef cookbook file in tar.gz format applied on the host.">
-        <generate-deployable type="chef.CookbookSpec" extends="udm.BaseDeployableFileArtifact" description="Chef cookbook file in tar.gz format applied on the host."/>
-        <property name="recipe" hidden="false" required="true" description="Recipe to be applied from cookbook. For example, test-cookbook::default where 'default' is the name of recipe in test-cookbook.tar.gz"/>
+    <type type="chef.Cookbook" deployable-type="chef.CookbookSpec" container-type="chef.Solo" extends="udm.BaseDeployedArtifact" description="Chef cookbook file applied on the host, in tar.gz format.">
+        <generate-deployable type="chef.CookbookSpec" extends="udm.BaseDeployableFileArtifact" description="Chef cookbook file applied on the host, in tar.gz format."/>
+        <property name="recipe" hidden="false" required="true" description="Comma-seperated list of recipes to be applied from cookbook. For example, test-cookbook::recipe-one, test-cookbook::recipe-two, where 'recipe-one' and 'recipe-two' are the names of recipes in test-cookbook.tar.gz."/>
+        <property name="runOrder" required="false" kind="integer" default="50" description="Order at which the Chef recipe should be run." category="Advanced"/>
+        <property name="applyOnNoop" required="false" kind="boolean" default="false" description="Run recipe on NOOP state." category="Advanced"/>
     </type>
 
-    <type type="chef.Solo" extends="generic.Container">
+    <type type="chef.Solo" extends="udm.BaseContainer">
+        <property name="host" kind="ci" referenced-type="overthere.Host" as-containment="true"/>
         <property name="chefPath" default="/usr/local/bin" required="false" description="Chef binary directory path."/>
+        <property name="tarCommand" required="false" description="Command used to open a .tar.gz file. If not specified the tar.exe from chefPath will be used. Microsoft Windows only." category="Windows"/>
     </type>
 </synthetic>

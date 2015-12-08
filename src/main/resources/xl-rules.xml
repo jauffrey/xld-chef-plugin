@@ -7,11 +7,15 @@
             <operation>CREATE</operation>
             <operation>MODIFY</operation>
         </conditions>
-        <steps>
-           <os-script>
-             <script>chef/chef-solo-cookbook</script>
-             <order>71</order>
-           </os-script>
-        </steps>
+        <planning-script-path>chef/scripts/add-chef-solo-cookbook-step.py</planning-script-path>
+    </rule>
+
+    <rule name="chef.Cookbook.NOOP" scope="deployed">
+        <conditions>
+            <type>chef.Cookbook</type>
+            <operation>NOOP</operation>
+            <expression>deployed.applyOnNoop</expression>
+        </conditions>
+        <planning-script-path>chef/scripts/add-chef-solo-cookbook-step.py</planning-script-path>
     </rule>
 </rules>
