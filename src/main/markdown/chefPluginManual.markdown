@@ -2,11 +2,11 @@
 
 * **XL Deploy requirements**
     * **XL Deploy**: Version 5.1.0+
-    * **Chef**: Versions 10.1+ (Unix)
+    * **Chef**: Versions 10.1+ (Unix and Windows)
     * **Other XL Deploy plugins**: None
 
 * **Infrastructural requirements**
-    * `chef-solo` software version 10.1+ configured on a Unix machine
+    * `chef-solo` software version 10.1+ configured on a Unix or Windows machine
 
 ## Overview ##
 
@@ -18,8 +18,6 @@ See the **Features** section below for the supported features.
 * Apply recipe for provisioning using `chef-solo`.
 
 ## Limitations ##
-
-* The plugin does not currently support deployments on Microsoft Windows-based hosts.
 
 * The plugin only supports deployment using `chef-solo`.
 
