@@ -27,7 +27,7 @@ public class ChefSoloCookbookItest extends ChefItestBase {
     public void shouldDeploySingleRecipe() throws IOException {
         Deployed<?, ?> deployed = getDeployedArtifact(COOKBOOK_FILE);
         deployed.setProperty("recipe", "test-book::default");
-        assertThat(getSteps(deployed).size(), equalTo(1));
+        assertThat(getSteps(deployed).size(), equalTo(2));
 
         DeployedApplication deployedManifest = newDeployedArtifact("chefCookbook", "1.0", deployed);
         assertInitial(deployedManifest);
@@ -39,7 +39,7 @@ public class ChefSoloCookbookItest extends ChefItestBase {
     public void shouldDeployMultipleRecipe() throws IOException {
         Deployed<?, ?> deployed = getDeployedArtifact(COOKBOOK_FILE);
         deployed.setProperty("recipe", "test-book::default,test-book::test");
-        assertThat(getSteps(deployed).size(), equalTo(1));
+        assertThat(getSteps(deployed).size(), equalTo(2));
 
         DeployedApplication deployedManifest = newDeployedArtifact("chefCookbook", "1.0", deployed);
         assertInitial(deployedManifest);
