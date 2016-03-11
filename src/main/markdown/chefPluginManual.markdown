@@ -1,25 +1,16 @@
-## Requirements ##
+The XL Deploy Chef plugin uses the Chef provisioning tool (`chef-solo`) to install recipes on hosts.
 
-* **XL Deploy requirements**
-    * **XL Deploy**: Version 5.1.0+
-    * **Chef**: Versions 10.1+ (Unix and Windows)
-    * **Other XL Deploy plugins**: None
+This document provides information that is specific to this version of the Chef plugin. For general information about the plugin, refer to [Introduction to the XL Deploy Chef plugin](/xl-deploy/concept/xl-deploy-chef-plugin.html).
 
-* **Infrastructural requirements**
-    * `chef-solo` software version 10.1+ configured on a Unix or Windows machine
+## Requirements
 
-## Overview ##
-
-The Chef plugin is an XL Deploy plugin that uses the Chef provisioning tool to install recipes on hosts.
-See the **Features** section below for the supported features.
-
-## Features ##
-
-* Apply recipe for provisioning using `chef-solo`.
+* XL Deploy 5.1.0 or later
+* Chef 10.1 (Unix or Windows)
+* `chef-solo` must be configured on the target machine
 
 ## Limitations ##
 
-* The plugin only supports deployment using `chef-solo`.
+The plugin only supports deployment using `chef-solo`.
 
 ## Release notes
 
