@@ -1,5 +1,30 @@
-apply plugin: 'release-plugin'
-apply plugin: 'commercial-plugin'
+buildscript {
+  repositories {
+    mavenLocal()
+    ["releases", "public"].each { r ->
+      maven {
+        url "${nexusBaseUrl}/repositories/${r}"
+        credentials {
+          username nexusUserName
+          password nexusPassword
+        }
+      }
+    }
+  }
+
+  dependencies {
+    classpath "com.xebialabs.gradle.plugins:gradle-xl-plugins-plugin:${xlPluginPluginVersion}"
+  }
+}
+
+apply plugin: "xebialabs.root.opinions"
+apply plugin: "xebialabs.dependency"
+apply plugin: "xebialabs.plugin.xld"
+
+dependencyManagement {
+  importConf "com.xebialabs.xl-platform:xl-reference:${xlPlatformVersion}"
+  importConf "com.xebialabs.deployit:xld-reference:${xlDeployVersion}"
+}
 
 docgen.product = 'XL Deploy'
 docgen.chefPluginManual = [
@@ -15,11 +40,14 @@ grouped by license:\n"""
 }
 
 dependencies {
-    compile overthere
-    compile xl_deploy_generic_plugin
+  compile 'com.xebialabs.deployit.plugins:generic-plugin'
+  compile 'com.xebialabs.overthere:overthere'
+  compile 'org.python:jython-standalone'
 
-    testCompile junit
-    testCompile xl_deploy_test_engine
-    testCompile overcast
-    testCompile "org.xmlmatchers:xml-matchers:0.10"
+  testCompile 'junit:junit'
+  testCompile 'com.xebialabs.deployit.engine:test-engine'
+  testCompile 'com.xebialabs.cloud:overcast'
+  testCompile "org.xmlmatchers:xml-matchers:0.10"
 }
+
+tasks['xlPlugin'].mustRunAfter tasks.withType(Test)

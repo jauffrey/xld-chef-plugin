@@ -2,9 +2,6 @@
 syntax: glob
 .gradle/
 
-# Gradle environment specific properties
-gradle.properties
-
 # Build output
 build/
 test-output/
@@ -45,4 +42,3 @@ ui-integration-test
 
 # itests inclusion file
 src/test/resources/deployed-test-scripts/enabled-itests
-.gitattributes
