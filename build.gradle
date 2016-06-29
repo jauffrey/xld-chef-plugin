@@ -39,6 +39,8 @@ thirdPartyLicense {
 grouped by license:\n"""
 }
 
+gradle.startParameter.excludedTaskNames = "test"
+
 dependencies {
   compile 'com.xebialabs.deployit.plugins:generic-plugin'
   compile 'com.xebialabs.overthere:overthere'
